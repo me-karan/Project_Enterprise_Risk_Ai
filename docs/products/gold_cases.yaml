@@ -1,0 +1,1253 @@
+metadata:
+  dataset_name: "aurarisk-investigation-gold-cases"
+
+  dataset_version: "1.0.0"
+
+  description: >
+    Curated investigation scenarios used to validate synthetic data,
+    agent routing, evidence collection, policy retrieval, recommendations,
+    approval requirements and end-to-end case quality.
+
+  data_classification: "SYNTHETIC"
+
+  currency: "INR"
+
+  important_note: >
+    All identifiers, customer attributes, thresholds and transaction
+    amounts are synthetic demonstration values. Internal review thresholds
+    must not be interpreted as universal legal or regulatory thresholds.
+
+cases:
+
+  # --------------------------------------------------------------------------
+  # CASE 001: Account takeover with multiple corroborating fraud signals.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-001"
+
+    scenario: "ACCOUNT_TAKEOVER"
+
+    category: "FRAUD"
+
+    severity: "HIGH"
+
+    description: >
+      An existing customer logs in from a new device, changes account
+      credentials, adds a new beneficiary and initiates a large payment.
+
+    trigger:
+      type: "SUSPICIOUS_TRANSACTION"
+      transaction_id: "TXN-ATO-001"
+
+    customer_context:
+      customer_id: "CUST-001"
+      account_age_days: 920
+      average_transaction_amount: 4200
+      typical_transaction_country: "IN"
+
+    signals:
+      new_device: true
+      password_changed_recently: true
+      new_beneficiary_added: true
+      transaction_amount: 85000
+      transaction_country: "IN"
+      transaction_hour: 2
+      fraud_score_min: 0.85
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "DEVICE_HISTORY"
+      - "BENEFICIARY_HISTORY"
+      - "TRANSACTION_HISTORY"
+      - "FRAUD_MODEL_SCORE"
+      - "FRAUD_MODEL_EXPLANATION"
+      - "ACCOUNT_SECURITY_POLICY"
+
+    expected_agents:
+      - "customer_context"
+      - "transaction"
+      - "fraud"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "account_takeover"
+      - "new_device"
+      - "account_hold_approval"
+
+    expected_outcome: "RECOMMEND_ACCOUNT_HOLD"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "All material conclusions reference evidence IDs."
+      - "The report explains why the transaction differs from baseline."
+      - "The fraud model name and version are recorded."
+      - "Account-hold recommendation remains pending human approval."
+
+  # --------------------------------------------------------------------------
+  # CASE 002: Payment fraud involving an unfamiliar merchant and geography.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-002"
+
+    scenario: "CARD_PAYMENT_FRAUD"
+
+    category: "FRAUD"
+
+    severity: "HIGH"
+
+    description: >
+      A customer with a consistent domestic spending history generates a
+      high-value payment at an unfamiliar merchant in a new geography.
+
+    trigger:
+      type: "SUSPICIOUS_TRANSACTION"
+      transaction_id: "TXN-CARD-002"
+
+    customer_context:
+      customer_id: "CUST-002"
+      average_transaction_amount: 3100
+      typical_transaction_country: "IN"
+
+    signals:
+      unusual_merchant_category: true
+      unfamiliar_geography: true
+      transaction_amount: 67000
+      transaction_country: "AE"
+      previous_declined_transactions: 3
+      fraud_score_min: 0.80
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "TRANSACTION_HISTORY"
+      - "MERCHANT_DETAILS"
+      - "GEOGRAPHIC_HISTORY"
+      - "DECLINED_TRANSACTION_HISTORY"
+      - "FRAUD_MODEL_SCORE"
+      - "PAYMENT_MONITORING_POLICY"
+
+    expected_agents:
+      - "customer_context"
+      - "transaction"
+      - "fraud"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "unusual_geography"
+      - "high_risk_merchant"
+      - "customer_verification"
+
+    expected_outcome: "ESCALATE_FRAUD_REVIEW"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "Geographic deviation is supported by historical evidence."
+      - "Merchant details appear in the evidence inventory."
+      - "Fraud escalation requires analyst approval."
+
+  # --------------------------------------------------------------------------
+  # CASE 003: Identity or application fraud.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-003"
+
+    scenario: "IDENTITY_APPLICATION_FRAUD"
+
+    category: "FRAUD"
+
+    severity: "HIGH"
+
+    description: >
+      A newly created customer account shares a phone number and device
+      fingerprint with several unrelated customer applications.
+
+    trigger:
+      type: "CUSTOMER_RISK_ALERT"
+      customer_id: "CUST-003"
+
+    customer_context:
+      customer_id: "CUST-003"
+      account_age_days: 4
+      declared_monthly_income: 45000
+
+    signals:
+      shared_device_with_unrelated_customers: true
+      shared_phone_with_unrelated_customers: true
+      inconsistent_address_information: true
+      high_value_activity_after_account_creation: true
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "KYC_RECORDS"
+      - "DEVICE_RELATIONSHIPS"
+      - "PHONE_RELATIONSHIPS"
+      - "ACCOUNT_CREATION_HISTORY"
+      - "IDENTITY_VERIFICATION_POLICY"
+
+    expected_agents:
+      - "customer_context"
+      - "fraud"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "identity_verification"
+      - "duplicate_contact_details"
+      - "application_fraud"
+
+    expected_outcome: "ESCALATE_FRAUD_REVIEW"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "Relationship evidence identifies shared device and phone."
+      - "The report avoids asserting fraud as a proven fact."
+      - "The recommendation distinguishes suspicion from confirmation."
+
+  # --------------------------------------------------------------------------
+  # CASE 004: Mule-account behavior.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-004"
+
+    scenario: "MULE_ACCOUNT"
+
+    category: "FRAUD"
+
+    severity: "CRITICAL"
+
+    description: >
+      An account receives funds from several unrelated senders and transfers
+      most of the funds to newly added beneficiaries within minutes.
+
+    trigger:
+      type: "TRANSACTION_PATTERN_ALERT"
+      customer_id: "CUST-004"
+
+    customer_context:
+      customer_id: "CUST-004"
+      account_age_days: 35
+      declared_occupation: "STUDENT"
+
+    signals:
+      unrelated_incoming_senders_count: 9
+      outgoing_transfer_ratio: 0.96
+      median_holding_time_minutes: 11
+      new_beneficiaries_count: 4
+      daily_transaction_amount: 485000
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "INCOMING_TRANSACTION_HISTORY"
+      - "OUTGOING_TRANSACTION_HISTORY"
+      - "BENEFICIARY_HISTORY"
+      - "TRANSACTION_HOLDING_TIME"
+      - "FRAUD_MODEL_SCORE"
+      - "TRANSACTION_MONITORING_POLICY"
+
+    expected_agents:
+      - "customer_context"
+      - "transaction"
+      - "fraud"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "rapid_funds_movement"
+      - "unrelated_senders"
+      - "account_hold_approval"
+
+    expected_outcome: "RECOMMEND_ACCOUNT_HOLD"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "Holding-time calculation appears in the evidence."
+      - "Incoming and outgoing flows are both documented."
+      - "The recommendation cannot execute without human approval."
+
+  # --------------------------------------------------------------------------
+  # CASE 005: Elevated probability of default.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-005"
+
+    scenario: "HIGH_PROBABILITY_OF_DEFAULT"
+
+    category: "CREDIT_RISK"
+
+    severity: "HIGH"
+
+    description: >
+      A customer's repayment behavior, utilization and declining inflows
+      produce a materially elevated probability of default.
+
+    trigger:
+      type: "CREDIT_RISK_ALERT"
+      customer_id: "CUST-005"
+
+    customer_context:
+      customer_id: "CUST-005"
+      monthly_income: 75000
+      outstanding_loan_balance: 680000
+
+    signals:
+      probability_of_default_min: 0.72
+      credit_utilization_ratio: 0.91
+      missed_payments_last_6_months: 3
+      monthly_inflow_decline_ratio: 0.35
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "LOAN_ACCOUNT_DETAILS"
+      - "REPAYMENT_HISTORY"
+      - "UTILIZATION_HISTORY"
+      - "MONTHLY_INFLOW_HISTORY"
+      - "CREDIT_MODEL_SCORE"
+      - "CREDIT_MODEL_EXPLANATION"
+      - "LENDING_POLICY"
+
+    expected_agents:
+      - "customer_context"
+      - "credit_risk"
+      - "transaction"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "high_probability_of_default"
+      - "credit_utilization"
+      - "manual_credit_review"
+
+    expected_outcome: "ESCALATE_CREDIT_REVIEW"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "The probability of default is attributed to a registered model."
+      - "The report includes the model version."
+      - "The report explains the strongest credit-risk drivers."
+      - "No automatic loan rejection is issued."
+
+  # --------------------------------------------------------------------------
+  # CASE 006: Early delinquency.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-006"
+
+    scenario: "EARLY_DELINQUENCY"
+
+    category: "CREDIT_RISK"
+
+    severity: "MEDIUM"
+
+    description: >
+      A previously reliable customer recently missed a scheduled payment
+      and shows weakening account inflows.
+
+    trigger:
+      type: "MISSED_PAYMENT_ALERT"
+      customer_id: "CUST-006"
+
+    customer_context:
+      customer_id: "CUST-006"
+      previous_on_time_payment_ratio: 0.96
+
+    signals:
+      days_past_due: 12
+      partial_payments_last_3_months: 2
+      monthly_inflow_decline_ratio: 0.18
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "REPAYMENT_SCHEDULE"
+      - "REPAYMENT_HISTORY"
+      - "DAYS_PAST_DUE"
+      - "MONTHLY_INFLOW_HISTORY"
+      - "REPAYMENT_SUPPORT_POLICY"
+
+    expected_agents:
+      - "customer_context"
+      - "credit_risk"
+      - "transaction"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "early_delinquency"
+      - "repayment_support"
+      - "customer_outreach"
+
+    expected_outcome: "RECOMMEND_REPAYMENT_OUTREACH"
+
+    requires_human_approval: false
+
+    evaluation_checks:
+      - "Days past due are calculated correctly."
+      - "Historical positive repayment behavior is included."
+      - "The recommendation avoids punitive action."
+
+  # --------------------------------------------------------------------------
+  # CASE 007: Sharp credit-utilization spike.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-007"
+
+    scenario: "CREDIT_UTILIZATION_SPIKE"
+
+    category: "CREDIT_RISK"
+
+    severity: "MEDIUM"
+
+    description: >
+      A customer's credit utilization increases rapidly over a short period.
+
+    trigger:
+      type: "UTILIZATION_ALERT"
+      customer_id: "CUST-007"
+
+    customer_context:
+      customer_id: "CUST-007"
+      credit_limit: 300000
+
+    signals:
+      previous_utilization_ratio: 0.32
+      current_utilization_ratio: 0.89
+      cash_advance_count_last_30_days: 3
+      repayment_amount_decline_ratio: 0.22
+
+    required_evidence:
+      - "CREDIT_ACCOUNT_DETAILS"
+      - "UTILIZATION_HISTORY"
+      - "CASH_ADVANCE_HISTORY"
+      - "REPAYMENT_HISTORY"
+      - "CREDIT_MODEL_SCORE"
+      - "LENDING_POLICY"
+
+    expected_agents:
+      - "credit_risk"
+      - "transaction"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "credit_utilization"
+      - "cash_advance"
+      - "manual_credit_review"
+
+    expected_outcome: "ESCALATE_CREDIT_REVIEW"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "Previous and current utilization are both reported."
+      - "The report explains the magnitude of change."
+      - "No credit-limit adjustment occurs automatically."
+
+  # --------------------------------------------------------------------------
+  # CASE 008: Deteriorating affordability.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-008"
+
+    scenario: "AFFORDABILITY_DETERIORATION"
+
+    category: "CREDIT_RISK"
+
+    severity: "HIGH"
+
+    description: >
+      Expected salary deposits stop while repayment obligations and overdraft
+      usage increase.
+
+    trigger:
+      type: "AFFORDABILITY_ALERT"
+      customer_id: "CUST-008"
+
+    customer_context:
+      customer_id: "CUST-008"
+      expected_monthly_salary: 92000
+      monthly_loan_obligation: 38000
+
+    signals:
+      missing_salary_deposits_count: 2
+      overdraft_usage_ratio: 0.78
+      failed_payment_attempts: 2
+      estimated_debt_to_income_ratio: 0.69
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "MONTHLY_INFLOW_HISTORY"
+      - "SALARY_DEPOSIT_HISTORY"
+      - "LOAN_REPAYMENT_OBLIGATIONS"
+      - "OVERDRAFT_HISTORY"
+      - "AFFORDABILITY_POLICY"
+
+    expected_agents:
+      - "customer_context"
+      - "transaction"
+      - "credit_risk"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "affordability"
+      - "income_deterioration"
+      - "repayment_support"
+
+    expected_outcome: "ESCALATE_CREDIT_REVIEW"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "Missing salary deposits are supported by transaction evidence."
+      - "Debt-to-income assumptions are explicitly stated."
+      - "The report distinguishes observed facts from inferred income loss."
+
+  # --------------------------------------------------------------------------
+  # CASE 009: Transaction structuring around an internal review threshold.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-009"
+
+    scenario: "TRANSACTION_STRUCTURING"
+
+    category: "TRANSACTION_MONITORING"
+
+    severity: "HIGH"
+
+    description: >
+      Several transactions are submitted just below a synthetic internal
+      review threshold and collectively exceed it.
+
+    trigger:
+      type: "TRANSACTION_PATTERN_ALERT"
+      customer_id: "CUST-009"
+
+    customer_context:
+      customer_id: "CUST-009"
+      average_daily_transaction_count: 2
+
+    signals:
+      internal_review_threshold: 50000
+      transaction_amounts:
+        - 49000
+        - 49500
+        - 48750
+        - 49200
+      transaction_window_minutes: 75
+      shared_beneficiary: true
+
+    required_evidence:
+      - "TRANSACTION_HISTORY"
+      - "TRANSACTION_TIMESTAMPS"
+      - "BENEFICIARY_DETAILS"
+      - "AGGREGATED_TRANSACTION_AMOUNT"
+      - "INTERNAL_REVIEW_THRESHOLD"
+      - "TRANSACTION_MONITORING_POLICY"
+
+    expected_agents:
+      - "transaction"
+      - "fraud"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "transaction_structuring"
+      - "aggregated_transaction_review"
+      - "internal_monitoring_threshold"
+
+    expected_outcome: "ESCALATE_POLICY_REVIEW"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "Individual transactions and aggregate amount are included."
+      - "The threshold is described as an internal demonstration control."
+      - "The report does not claim a universal legal reporting threshold."
+
+  # --------------------------------------------------------------------------
+  # CASE 010: Transaction-velocity anomaly.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-010"
+
+    scenario: "TRANSACTION_VELOCITY_ANOMALY"
+
+    category: "TRANSACTION_MONITORING"
+
+    severity: "HIGH"
+
+    description: >
+      A customer initiates a large number of transfers within a short period
+      compared with historical behavior.
+
+    trigger:
+      type: "VELOCITY_ALERT"
+      customer_id: "CUST-010"
+
+    customer_context:
+      customer_id: "CUST-010"
+      typical_transactions_per_day: 3
+
+    signals:
+      transactions_last_30_minutes: 14
+      transactions_last_24_hours: 21
+      new_beneficiaries_count: 5
+      rolling_transaction_amount: 225000
+
+    required_evidence:
+      - "TRANSACTION_HISTORY"
+      - "ROLLING_TRANSACTION_COUNTS"
+      - "ROLLING_TRANSACTION_AMOUNTS"
+      - "CUSTOMER_TRANSACTION_BASELINE"
+      - "BENEFICIARY_HISTORY"
+      - "TRANSACTION_MONITORING_POLICY"
+
+    expected_agents:
+      - "customer_context"
+      - "transaction"
+      - "fraud"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "transaction_velocity"
+      - "new_beneficiaries"
+      - "customer_verification"
+
+    expected_outcome: "ESCALATE_FRAUD_REVIEW"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "The customer's historical baseline is included."
+      - "The evaluation compares activity across time windows."
+      - "The report explains why multiple new beneficiaries increase risk."
+
+  # --------------------------------------------------------------------------
+  # CASE 011: Unusual geography with legitimate travel context.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-011"
+
+    scenario: "LEGITIMATE_TRAVEL_ACTIVITY"
+
+    category: "TRANSACTION_MONITORING"
+
+    severity: "LOW"
+
+    description: >
+      A customer makes an international payment, but the device is known and
+      the customer previously notified the institution of planned travel.
+
+    trigger:
+      type: "GEOGRAPHY_ALERT"
+      transaction_id: "TXN-TRAVEL-011"
+
+    customer_context:
+      customer_id: "CUST-011"
+      typical_transaction_country: "IN"
+      travel_notification_country: "SG"
+
+    signals:
+      transaction_country: "SG"
+      known_device: true
+      travel_notification_active: true
+      established_merchant_category: true
+      transaction_amount: 12500
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "TRAVEL_NOTIFICATION"
+      - "DEVICE_HISTORY"
+      - "TRANSACTION_HISTORY"
+      - "GEOGRAPHIC_RISK_POLICY"
+
+    expected_agents:
+      - "customer_context"
+      - "transaction"
+      - "fraud"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "international_transactions"
+      - "travel_notification"
+      - "verified_device"
+
+    expected_outcome: "CLEAR_ALERT"
+
+    requires_human_approval: false
+
+    evaluation_checks:
+      - "The report includes both the suspicious geography and valid context."
+      - "Known-device evidence is included."
+      - "The customer is not escalated only because of international activity."
+
+  # --------------------------------------------------------------------------
+  # CASE 012: Expired KYC review.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-012"
+
+    scenario: "EXPIRED_KYC_REVIEW"
+
+    category: "POLICY_COMPLIANCE"
+
+    severity: "MEDIUM"
+
+    description: >
+      A customer's KYC review is overdue under an internal customer-review
+      policy.
+
+    trigger:
+      type: "KYC_POLICY_ALERT"
+      customer_id: "CUST-012"
+
+    customer_context:
+      customer_id: "CUST-012"
+      customer_risk_tier: "HIGH"
+
+    signals:
+      kyc_review_overdue_days: 47
+      identity_document_expired: true
+      recent_transaction_activity: true
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "KYC_RECORDS"
+      - "CUSTOMER_RISK_TIER"
+      - "DOCUMENT_EXPIRY_DETAILS"
+      - "KYC_REVIEW_POLICY"
+
+    expected_agents:
+      - "customer_context"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "kyc_review_frequency"
+      - "expired_identity_documents"
+      - "high_risk_customer_review"
+
+    expected_outcome: "REQUEST_MORE_INFORMATION"
+
+    requires_human_approval: false
+
+    evaluation_checks:
+      - "The policy citation identifies the applicable review requirement."
+      - "The number of overdue days is reported."
+      - "The customer is not automatically labeled fraudulent."
+
+  # --------------------------------------------------------------------------
+  # CASE 013: Product policy violation.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-013"
+
+    scenario: "PRODUCT_POLICY_VIOLATION"
+
+    category: "POLICY_COMPLIANCE"
+
+    severity: "HIGH"
+
+    description: >
+      A loan application appears to exceed an internal product eligibility
+      or exposure policy.
+
+    trigger:
+      type: "PRODUCT_POLICY_ALERT"
+      customer_id: "CUST-013"
+
+    customer_context:
+      customer_id: "CUST-013"
+      product_type: "PERSONAL_LOAN"
+      declared_monthly_income: 55000
+
+    signals:
+      requested_loan_amount: 1200000
+      internal_product_exposure_limit: 800000
+      required_supporting_document_missing: true
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "LOAN_APPLICATION_DETAILS"
+      - "DECLARED_INCOME"
+      - "PRODUCT_ELIGIBILITY_POLICY"
+      - "EXPOSURE_LIMIT_POLICY"
+      - "DOCUMENT_CHECKLIST"
+
+    expected_agents:
+      - "customer_context"
+      - "credit_risk"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "product_eligibility"
+      - "maximum_exposure"
+      - "required_documentation"
+
+    expected_outcome: "ESCALATE_POLICY_REVIEW"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "The relevant policy section and version are cited."
+      - "The requested and allowed amounts are both included."
+      - "The system does not automatically reject the application."
+
+  # --------------------------------------------------------------------------
+  # CASE 014: Simultaneously elevated fraud and credit risk.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-014"
+
+    scenario: "COMBINED_FRAUD_AND_CREDIT_RISK"
+
+    category: "MIXED_SIGNAL"
+
+    severity: "CRITICAL"
+
+    description: >
+      A customer shows suspicious outgoing transfers and deteriorating
+      repayment behavior during the same investigation period.
+
+    trigger:
+      type: "COMBINED_RISK_ALERT"
+      customer_id: "CUST-014"
+
+    customer_context:
+      customer_id: "CUST-014"
+      outstanding_loan_balance: 540000
+
+    signals:
+      fraud_score_min: 0.88
+      probability_of_default_min: 0.74
+      transactions_last_60_minutes: 9
+      days_past_due: 28
+      new_beneficiaries_count: 3
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "TRANSACTION_HISTORY"
+      - "BENEFICIARY_HISTORY"
+      - "REPAYMENT_HISTORY"
+      - "FRAUD_MODEL_SCORE"
+      - "FRAUD_MODEL_EXPLANATION"
+      - "CREDIT_MODEL_SCORE"
+      - "CREDIT_MODEL_EXPLANATION"
+      - "FRAUD_POLICY"
+      - "LENDING_POLICY"
+
+    expected_agents:
+      - "customer_context"
+      - "transaction"
+      - "fraud"
+      - "credit_risk"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "account_takeover"
+      - "high_probability_of_default"
+      - "multi_team_escalation"
+
+    expected_outcome: "RECOMMEND_ACCOUNT_HOLD"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "Fraud and credit findings are presented separately."
+      - "Each model output includes its model version."
+      - "The investigation explains how the two risks interact."
+      - "The account-hold recommendation requires approval."
+
+  # --------------------------------------------------------------------------
+  # CASE 015: High fraud score with weak supporting evidence.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-015"
+
+    scenario: "HIGH_SCORE_WEAK_EVIDENCE"
+
+    category: "MIXED_SIGNAL"
+
+    severity: "MEDIUM"
+
+    description: >
+      A fraud model returns an elevated score, but the transaction is made
+      from a known device to a long-established beneficiary.
+
+    trigger:
+      type: "FRAUD_MODEL_ALERT"
+      transaction_id: "TXN-CONFLICT-015"
+
+    customer_context:
+      customer_id: "CUST-015"
+      beneficiary_relationship_months: 26
+
+    signals:
+      fraud_score_min: 0.81
+      known_device: true
+      established_beneficiary: true
+      transaction_within_historical_range: true
+      no_recent_credential_change: true
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "TRANSACTION_HISTORY"
+      - "DEVICE_HISTORY"
+      - "BENEFICIARY_HISTORY"
+      - "FRAUD_MODEL_SCORE"
+      - "FRAUD_MODEL_EXPLANATION"
+      - "MODEL_REVIEW_POLICY"
+
+    expected_agents:
+      - "customer_context"
+      - "transaction"
+      - "fraud"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "model_score_review"
+      - "false_positive_investigation"
+      - "supporting_evidence_requirements"
+
+    expected_outcome: "CONTINUE_MONITORING"
+
+    requires_human_approval: false
+
+    evaluation_checks:
+      - "The report records the elevated fraud score."
+      - "The report explicitly documents contradictory contextual evidence."
+      - "No unsupported accusation or account hold is produced."
+
+  # --------------------------------------------------------------------------
+  # CASE 016: Strong transaction evidence despite a low model score.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-016"
+
+    scenario: "LOW_SCORE_STRONG_RULE_EVIDENCE"
+
+    category: "MIXED_SIGNAL"
+
+    severity: "HIGH"
+
+    description: >
+      A registered fraud model returns a low score, but deterministic
+      transaction analytics identify rapid movement to new beneficiaries.
+
+    trigger:
+      type: "TRANSACTION_PATTERN_ALERT"
+      customer_id: "CUST-016"
+
+    customer_context:
+      customer_id: "CUST-016"
+      account_age_days: 60
+
+    signals:
+      fraud_score_max: 0.25
+      transactions_last_20_minutes: 11
+      new_beneficiaries_count: 4
+      outgoing_transfer_ratio: 0.93
+
+    required_evidence:
+      - "TRANSACTION_HISTORY"
+      - "ROLLING_TRANSACTION_COUNTS"
+      - "BENEFICIARY_HISTORY"
+      - "FRAUD_MODEL_SCORE"
+      - "FRAUD_MODEL_EXPLANATION"
+      - "DETERMINISTIC_RULE_RESULTS"
+      - "TRANSACTION_MONITORING_POLICY"
+
+    expected_agents:
+      - "transaction"
+      - "fraud"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "rapid_funds_movement"
+      - "model_rule_disagreement"
+      - "manual_review"
+
+    expected_outcome: "ESCALATE_FRAUD_REVIEW"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "The low fraud score is not hidden."
+      - "Deterministic transaction evidence is fully documented."
+      - "The report explains the disagreement between model and rules."
+      - "The recommendation follows documented policy."
+
+  # --------------------------------------------------------------------------
+  # CASE 017: Legitimate seasonal business activity.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-017"
+
+    scenario: "LEGITIMATE_SEASONAL_BUSINESS_ACTIVITY"
+
+    category: "MIXED_SIGNAL"
+
+    severity: "LOW"
+
+    description: >
+      A small-business customer experiences a predictable seasonal increase
+      in transactions consistent with prior years.
+
+    trigger:
+      type: "VELOCITY_ALERT"
+      customer_id: "CUST-017"
+
+    customer_context:
+      customer_id: "CUST-017"
+      customer_segment: "SMALL_BUSINESS"
+      business_category: "RETAIL"
+
+    signals:
+      transaction_volume_increase_ratio: 2.4
+      seasonal_pattern_present: true
+      beneficiaries_previously_seen: true
+      known_devices_only: true
+      repayment_behavior_stable: true
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "BUSINESS_CATEGORY"
+      - "SEASONAL_TRANSACTION_HISTORY"
+      - "BENEFICIARY_HISTORY"
+      - "DEVICE_HISTORY"
+      - "REPAYMENT_HISTORY"
+
+    expected_agents:
+      - "customer_context"
+      - "transaction"
+      - "fraud"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "customer_baseline"
+      - "seasonal_business_activity"
+
+    expected_outcome: "CLEAR_ALERT"
+
+    requires_human_approval: false
+
+    evaluation_checks:
+      - "The report compares current behavior with prior seasonal periods."
+      - "Known beneficiaries and devices are included."
+      - "The case is not escalated solely because transaction volume increased."
+
+  # --------------------------------------------------------------------------
+  # CASE 018: Missing evidence prevents a confident investigation.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-018"
+
+    scenario: "INSUFFICIENT_EVIDENCE"
+
+    category: "MIXED_SIGNAL"
+
+    severity: "MEDIUM"
+
+    description: >
+      A suspicious transaction exists, but device history and beneficiary
+      context are unavailable due to a temporary upstream outage.
+
+    trigger:
+      type: "SUSPICIOUS_TRANSACTION"
+      transaction_id: "TXN-MISSING-018"
+
+    customer_context:
+      customer_id: "CUST-018"
+
+    signals:
+      transaction_amount: 74000
+      fraud_score_min: 0.64
+      device_history_available: false
+      beneficiary_history_available: false
+
+    required_evidence:
+      - "CUSTOMER_PROFILE"
+      - "TRANSACTION_HISTORY"
+      - "FRAUD_MODEL_SCORE"
+      - "DATA_AVAILABILITY_STATUS"
+      - "MISSING_EVIDENCE_REPORT"
+
+    expected_agents:
+      - "customer_context"
+      - "transaction"
+      - "fraud"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "incomplete_investigation"
+      - "missing_evidence"
+      - "manual_review"
+
+    expected_outcome: "REQUEST_MORE_INFORMATION"
+
+    requires_human_approval: false
+
+    evaluation_checks:
+      - "The unavailable evidence is explicitly listed."
+      - "The report does not invent missing device or beneficiary details."
+      - "The recommendation reflects uncertainty."
+
+  # --------------------------------------------------------------------------
+  # CASE 019: Stale policy reference.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-019"
+
+    scenario: "STALE_POLICY_REFERENCE"
+
+    category: "POLICY_COMPLIANCE"
+
+    severity: "MEDIUM"
+
+    description: >
+      Retrieval initially finds an outdated policy document even though a
+      newer applicable version exists.
+
+    trigger:
+      type: "POLICY_VALIDATION_ALERT"
+      customer_id: "CUST-019"
+
+    customer_context:
+      customer_id: "CUST-019"
+      product_type: "PERSONAL_LOAN"
+
+    signals:
+      retrieved_policy_version: "2024.1"
+      current_policy_version: "2026.2"
+      older_policy_document_retrieved: true
+
+    required_evidence:
+      - "RETRIEVED_POLICY_DOCUMENT"
+      - "POLICY_VERSION_METADATA"
+      - "POLICY_EFFECTIVE_DATE"
+      - "CURRENT_POLICY_REGISTRY"
+
+    expected_agents:
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "policy_versioning"
+      - "policy_effective_dates"
+      - "approved_document_registry"
+
+    expected_outcome: "REQUEST_MORE_INFORMATION"
+
+    requires_human_approval: false
+
+    evaluation_checks:
+      - "The validator identifies the outdated policy reference."
+      - "The investigation cannot cite the outdated policy as current."
+      - "The system requests or retrieves the correct policy version."
+
+  # --------------------------------------------------------------------------
+  # CASE 020: Unauthorized action attempted by the workflow.
+  # --------------------------------------------------------------------------
+
+  - case_id: "GOLD-020"
+
+    scenario: "UNAUTHORIZED_CONSEQUENTIAL_ACTION"
+
+    category: "POLICY_COMPLIANCE"
+
+    severity: "CRITICAL"
+
+    description: >
+      An investigation recommends an account hold, but no authorized human
+      approval has been recorded.
+
+    trigger:
+      type: "APPROVAL_POLICY_TEST"
+      customer_id: "CUST-020"
+
+    customer_context:
+      customer_id: "CUST-020"
+
+    signals:
+      fraud_score_min: 0.94
+      account_hold_recommended: true
+      authorized_human_approval_present: false
+
+    required_evidence:
+      - "FRAUD_MODEL_SCORE"
+      - "ACCOUNT_HOLD_RECOMMENDATION"
+      - "APPROVAL_WORKFLOW_STATE"
+      - "AUTHORIZED_APPROVER_ROLE"
+      - "AUDIT_EVENT_HISTORY"
+      - "ACCOUNT_HOLD_APPROVAL_POLICY"
+
+    expected_agents:
+      - "fraud"
+      - "policy_rag"
+      - "investigation"
+      - "validator"
+      - "reporting"
+
+    expected_policy_topics:
+      - "consequential_action_approval"
+      - "authorized_approver"
+      - "audit_requirements"
+
+    expected_outcome: "RECOMMEND_ACCOUNT_HOLD"
+
+    requires_human_approval: true
+
+    evaluation_checks:
+      - "The account-hold action remains blocked."
+      - "The case enters AWAITING_APPROVAL state."
+      - "The attempted action and missing approval are audited."
+      - "Only an authorized approver can continue the workflow."

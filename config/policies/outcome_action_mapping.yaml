@@ -1,0 +1,64 @@
+# Maps business-facing investigation outcomes to deterministic policy actions.
+#
+# This keeps LLM-generated recommendations separate from executable actions.
+# The application must resolve outcomes through this mapping before evaluating
+# action permissions and approvals.
+
+mapping_policy:
+  policy_id: "AURARISK-OUTCOME-ACTION-MAPPING"
+  version: "1.0.0"
+
+  # Unknown investigation outcomes must not trigger an action.
+  default_effect: "DENY"
+
+mappings:
+
+  CLEAR_ALERT:
+    policy_action: "CONFIRM_CLEAR_ALERT"
+
+    # A human confirms the final case disposition.
+    final_confirmation_required: true
+
+    # Clearing a case does not require a separate consequential-action
+    # approval workflow.
+    consequential_approval_required: false
+
+  CONTINUE_MONITORING:
+    policy_action: "CONFIRM_CONTINUE_MONITORING"
+    final_confirmation_required: true
+    consequential_approval_required: false
+
+  REQUEST_MORE_INFORMATION:
+    policy_action: "REQUEST_MORE_INFORMATION"
+    final_confirmation_required: true
+    consequential_approval_required: false
+
+  ESCALATE_FRAUD_REVIEW:
+    policy_action: "CREATE_FRAUD_ESCALATION"
+    final_confirmation_required: true
+    consequential_approval_required: true
+
+  ESCALATE_CREDIT_REVIEW:
+    policy_action: "CREATE_CREDIT_RISK_ESCALATION"
+    final_confirmation_required: true
+    consequential_approval_required: true
+
+  ESCALATE_POLICY_REVIEW:
+    policy_action: "CREATE_POLICY_ESCALATION"
+    final_confirmation_required: true
+    consequential_approval_required: true
+
+  RECOMMEND_ACCOUNT_HOLD:
+    policy_action: "SUBMIT_ACCOUNT_HOLD_RECOMMENDATION"
+    final_confirmation_required: true
+    consequential_approval_required: true
+
+  RECOMMEND_CUSTOMER_VERIFICATION:
+    policy_action: "CONFIRM_CUSTOMER_VERIFICATION_RECOMMENDATION"
+    final_confirmation_required: true
+    consequential_approval_required: false
+
+  RECOMMEND_REPAYMENT_OUTREACH:
+    policy_action: "CONFIRM_REPAYMENT_OUTREACH_RECOMMENDATION"
+    final_confirmation_required: true
+    consequential_approval_required: false

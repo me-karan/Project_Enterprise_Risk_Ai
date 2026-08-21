@@ -1,0 +1,18 @@
+[project]
+name = "enterprise-risk-ai"
+version = "0.1.0"
+description = "Investigate suspicious customers or transactions by combining fraud models,credit-risk models, transaction analytics and policy evidence into an auditable case report."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "faker>=40.36.0",
+    "numpy>=2.5.2",
+    "pandas>=3.0.5",
+    "pyarrow>=25.0.1",
+    "pydantic>=2.13.4",
+    "pydantic-settings>=2.15.0",
+    "pytest>=9.1.1",
+    "pyyaml>=6.0.3",
+    "ruff>=0.16.4",
+    "scipy>=1.18.0",
+]

@@ -1,0 +1,305 @@
+# AuraRisk machine-readable action policy.
+#
+# Application code will load and validate this file using Pydantic.
+# If loading or validation fails, the policy engine must deny the action.
+
+policy:
+  policy_id: "AURARISK-ACTION-POLICY"
+  version: "1.0.0"
+
+  # Any action not explicitly present below is denied.
+  default_effect: "DENY"
+
+  # Approval is valid only for a limited time.
+  default_approval_ttl_minutes: 30
+
+  # Material case changes invalidate existing approvals.
+  invalidate_on_case_version_change: true
+  invalidate_on_evidence_change: true
+  invalidate_on_recommendation_change: true
+  invalidate_on_model_version_change: true
+  invalidate_on_policy_version_change: true
+
+roles:
+  system_agent:
+    human: false
+
+  fraud_analyst:
+    human: true
+
+  credit_risk_analyst:
+    human: true
+
+  investigation_supervisor:
+    human: true
+
+  compliance_reviewer:
+    human: true
+
+  platform_administrator:
+    human: true
+
+  auditor:
+    human: true
+
+actions:
+
+  READ_CASE_DATA:
+    risk_level: "READ_ONLY"
+    execution_mode: "READ_ONLY"
+    requester_roles:
+      - "system_agent"
+      - "fraud_analyst"
+      - "credit_risk_analyst"
+      - "investigation_supervisor"
+      - "compliance_reviewer"
+      - "auditor"
+    approvals_required: 0
+    validator_required: false
+    audit_required: true
+
+  RUN_REGISTERED_MODEL:
+    risk_level: "READ_ONLY"
+    execution_mode: "READ_ONLY"
+    requester_roles:
+      - "system_agent"
+      - "fraud_analyst"
+      - "credit_risk_analyst"
+      - "investigation_supervisor"
+    approvals_required: 0
+    validator_required: false
+    audit_required: true
+
+  RETRIEVE_APPROVED_POLICY:
+    risk_level: "READ_ONLY"
+    execution_mode: "READ_ONLY"
+    requester_roles:
+      - "system_agent"
+      - "fraud_analyst"
+      - "credit_risk_analyst"
+      - "investigation_supervisor"
+      - "compliance_reviewer"
+      - "auditor"
+    approvals_required: 0
+    validator_required: false
+    audit_required: true
+
+  GENERATE_DRAFT_FINDING:
+    risk_level: "LOW"
+    execution_mode: "DRAFT_ONLY"
+    requester_roles:
+      - "system_agent"
+    approvals_required: 0
+    validator_required: false
+    audit_required: true
+
+  REQUEST_MORE_INFORMATION:
+    risk_level: "MEDIUM"
+    execution_mode: "INTERNAL_CASE_TRANSITION"
+    requester_roles:
+      - "system_agent"
+      - "fraud_analyst"
+      - "credit_risk_analyst"
+      - "investigation_supervisor"
+    approver_roles:
+      - "fraud_analyst"
+      - "credit_risk_analyst"
+      - "investigation_supervisor"
+    approvals_required: 1
+    distinct_approvers_required: true
+    self_approval_allowed: true
+    validator_required: true
+    human_rationale_required: true
+    audit_required: true
+    target_case_state: "DATA_COLLECTION"
+
+  CONFIRM_CLEAR_ALERT:
+    risk_level: "MEDIUM"
+    execution_mode: "INTERNAL_CASE_TRANSITION"
+    requester_roles:
+      - "system_agent"
+      - "fraud_analyst"
+      - "investigation_supervisor"
+    approver_roles:
+      - "fraud_analyst"
+      - "investigation_supervisor"
+    approvals_required: 1
+    distinct_approvers_required: true
+    self_approval_allowed: true
+    validator_required: true
+    human_rationale_required: true
+    audit_required: true
+    target_case_state: "COMPLETED"
+
+  CONFIRM_CONTINUE_MONITORING:
+    risk_level: "MEDIUM"
+    execution_mode: "INTERNAL_CASE_TRANSITION"
+    requester_roles:
+      - "system_agent"
+      - "fraud_analyst"
+      - "credit_risk_analyst"
+      - "investigation_supervisor"
+    approver_roles:
+      - "fraud_analyst"
+      - "credit_risk_analyst"
+      - "investigation_supervisor"
+    approvals_required: 1
+    distinct_approvers_required: true
+    self_approval_allowed: true
+    validator_required: true
+    human_rationale_required: true
+    audit_required: true
+    target_case_state: "COMPLETED"
+
+  CREATE_FRAUD_ESCALATION:
+    risk_level: "HIGH"
+    execution_mode: "INTERNAL_RECORD_ONLY"
+    requester_roles:
+      - "system_agent"
+      - "fraud_analyst"
+    approver_roles:
+      - "fraud_analyst"
+      - "investigation_supervisor"
+    approvals_required: 1
+    distinct_approvers_required: true
+    self_approval_allowed: false
+    validator_required: true
+    human_rationale_required: true
+    audit_required: true
+    target_case_state: "COMPLETED"
+
+  CREATE_CREDIT_RISK_ESCALATION:
+    risk_level: "HIGH"
+    execution_mode: "INTERNAL_RECORD_ONLY"
+    requester_roles:
+      - "system_agent"
+      - "credit_risk_analyst"
+    approver_roles:
+      - "credit_risk_analyst"
+      - "investigation_supervisor"
+    approvals_required: 1
+    distinct_approvers_required: true
+    self_approval_allowed: false
+    validator_required: true
+    human_rationale_required: true
+    audit_required: true
+    target_case_state: "COMPLETED"
+
+  CREATE_POLICY_ESCALATION:
+    risk_level: "HIGH"
+    execution_mode: "INTERNAL_RECORD_ONLY"
+    requester_roles:
+      - "system_agent"
+      - "compliance_reviewer"
+    approver_roles:
+      - "compliance_reviewer"
+      - "investigation_supervisor"
+    approvals_required: 1
+    distinct_approvers_required: true
+    self_approval_allowed: false
+    validator_required: true
+    human_rationale_required: true
+    audit_required: true
+    target_case_state: "COMPLETED"
+
+  SUBMIT_ACCOUNT_HOLD_RECOMMENDATION:
+    risk_level: "CRITICAL"
+
+    # The portfolio records the approved recommendation only.
+    # It never modifies a real customer account.
+    execution_mode: "INTERNAL_RECORD_ONLY"
+
+    requester_roles:
+      - "system_agent"
+      - "fraud_analyst"
+
+    approver_roles:
+      - "investigation_supervisor"
+      - "compliance_reviewer"
+
+    approvals_required: 2
+    distinct_approvers_required: true
+    self_approval_allowed: false
+    validator_required: true
+    human_rationale_required: true
+    audit_required: true
+    approval_ttl_minutes: 15
+    target_case_state: "COMPLETED"
+
+  APPLY_REAL_ACCOUNT_HOLD:
+    risk_level: "PROHIBITED"
+    execution_mode: "PROHIBITED"
+    approvals_required: 0
+    audit_required: true
+
+  CHANGE_CUSTOMER_CREDIT_LIMIT:
+    risk_level: "PROHIBITED"
+    execution_mode: "PROHIBITED"
+    approvals_required: 0
+    audit_required: true
+
+  APPROVE_OR_REJECT_LOAN:
+    risk_level: "PROHIBITED"
+    execution_mode: "PROHIBITED"
+    approvals_required: 0
+    audit_required: true
+
+  TRANSFER_CUSTOMER_FUNDS:
+    risk_level: "PROHIBITED"
+    execution_mode: "PROHIBITED"
+    approvals_required: 0
+    audit_required: true
+
+  SEND_EXTERNAL_CUSTOMER_NOTIFICATION:
+    risk_level: "PROHIBITED"
+    execution_mode: "PROHIBITED"
+    approvals_required: 0
+    audit_required: true
+
+  FILE_EXTERNAL_REGULATORY_REPORT:
+    risk_level: "PROHIBITED"
+    execution_mode: "PROHIBITED"
+    approvals_required: 0
+    audit_required: true
+    
+  CONFIRM_CUSTOMER_VERIFICATION_RECOMMENDATION:
+    risk_level: "MEDIUM"
+    execution_mode: "INTERNAL_RECORD_ONLY"
+
+    requester_roles:
+      - "system_agent"
+      - "fraud_analyst"
+      - "investigation_supervisor"
+
+    approver_roles:
+      - "fraud_analyst"
+      - "investigation_supervisor"
+
+    approvals_required: 1
+    distinct_approvers_required: true
+    self_approval_allowed: true
+    validator_required: true
+    human_rationale_required: true
+    audit_required: true
+    target_case_state: "COMPLETED"
+
+  CONFIRM_REPAYMENT_OUTREACH_RECOMMENDATION:
+    risk_level: "MEDIUM"
+    execution_mode: "INTERNAL_RECORD_ONLY"
+
+    requester_roles:
+      - "system_agent"
+      - "credit_risk_analyst"
+      - "investigation_supervisor"
+
+    approver_roles:
+      - "credit_risk_analyst"
+      - "investigation_supervisor"
+
+    approvals_required: 1
+    distinct_approvers_required: true
+    self_approval_allowed: true
+    validator_required: true
+    human_rationale_required: true
+    audit_required: true
+    target_case_state: "COMPLETED"

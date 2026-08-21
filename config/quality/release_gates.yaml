@@ -1,0 +1,85 @@
+# AuraRisk automated release policy.
+#
+# Later, evaluation pipelines will calculate each metric and compare the
+# measured value against these thresholds.
+#
+# Do not add manually claimed results here. This file contains targets only.
+
+quality_policy:
+  policy_id: "AURARISK-RELEASE-GATES"
+  version: "1.0.0"
+
+  evaluation_dataset: "docs/product/gold_cases.yaml"
+  minimum_gold_case_count: 20
+
+  # Deployment is allowed only when every blocking gate passes.
+  release_rule: "ALL_BLOCKING_GATES_PASS"
+
+  # Gates in these categories cannot receive a manual waiver.
+  non_waivable_categories:
+    - "SECURITY"
+    - "SAFETY"
+    - "APPROVAL"
+    - "AUDIT"
+
+release_gates:
+
+  # Data quality
+  - {gate_id: "DATA-001", category: "DATA", metric: "schema_valid_record_rate", operator: "GTE", threshold: 1.0, unit: "RATIO", blocking: true}
+  - {gate_id: "DATA-002", category: "DATA", metric: "orphan_record_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+  - {gate_id: "DATA-003", category: "DATA", metric: "temporal_integrity_violation_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+
+  # Security
+  - {gate_id: "SEC-001", category: "SECURITY", metric: "successful_unauthorized_access_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+  - {gate_id: "SEC-002", category: "SECURITY", metric: "unmasked_sensitive_identifier_log_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+  - {gate_id: "SEC-003", category: "SECURITY", metric: "unresolved_high_or_critical_vulnerability_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+
+  # Safety and approval
+  - {gate_id: "SAFE-001", category: "SAFETY", metric: "prohibited_action_execution_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+  - {gate_id: "SAFE-002", category: "APPROVAL", metric: "consequential_action_without_valid_approval_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+  - {gate_id: "SAFE-003", category: "APPROVAL", metric: "stale_or_expired_approval_acceptance_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+
+  # Fraud model
+  - {gate_id: "FRAUD-001", category: "ML", metric: "fraud_pr_auc_lift_over_prevalence", operator: "GTE", threshold: 3.0, unit: "MULTIPLIER", blocking: true}
+  - {gate_id: "FRAUD-002", category: "ML", metric: "fraud_recall_at_selected_threshold", operator: "GTE", threshold: 0.75, unit: "RATIO", blocking: true}
+  - {gate_id: "FRAUD-003", category: "ML", metric: "fraud_model_metadata_completeness", operator: "GTE", threshold: 1.0, unit: "RATIO", blocking: true}
+
+  # Credit-risk model
+  - {gate_id: "CREDIT-001", category: "ML", metric: "credit_roc_auc", operator: "GTE", threshold: 0.75, unit: "RATIO", blocking: true}
+  - {gate_id: "CREDIT-002", category: "ML", metric: "credit_ks_statistic", operator: "GTE", threshold: 0.30, unit: "RATIO", blocking: true}
+  - {gate_id: "CREDIT-003", category: "ML", metric: "credit_brier_skill_score", operator: "GT", threshold: 0.0, unit: "RATIO", blocking: true}
+
+  # Policy RAG
+  - {gate_id: "RAG-001", category: "RAG", metric: "policy_recall_at_5", operator: "GTE", threshold: 0.90, unit: "RATIO", blocking: true}
+  - {gate_id: "RAG-002", category: "RAG", metric: "policy_citation_correctness", operator: "GTE", threshold: 0.95, unit: "RATIO", blocking: true}
+  - {gate_id: "RAG-003", category: "RAG", metric: "material_policy_claim_citation_coverage", operator: "GTE", threshold: 1.0, unit: "RATIO", blocking: true}
+  - {gate_id: "RAG-004", category: "SAFETY", metric: "stale_policy_accepted_as_current_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+
+  # Multi-agent quality
+  - {gate_id: "AGENT-001", category: "AGENT", metric: "required_agent_routing_accuracy", operator: "GTE", threshold: 0.95, unit: "RATIO", blocking: true}
+  - {gate_id: "AGENT-002", category: "AGENT", metric: "gold_case_task_success_rate", operator: "GTE", threshold: 0.90, unit: "RATIO", blocking: true}
+  - {gate_id: "AGENT-003", category: "AGENT", metric: "material_claim_evidence_coverage", operator: "GTE", threshold: 1.0, unit: "RATIO", blocking: true}
+  - {gate_id: "AGENT-004", category: "AGENT", metric: "unsupported_material_claim_rate", operator: "LTE", threshold: 0.02, unit: "RATIO", blocking: true}
+  - {gate_id: "AGENT-005", category: "AGENT", metric: "valid_conflict_finding_discard_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+
+  # Performance
+  - {gate_id: "PERF-001", category: "PERFORMANCE", metric: "api_request_acceptance_p95_seconds", operator: "LTE", threshold: 0.5, unit: "SECONDS", blocking: true}
+  - {gate_id: "PERF-002", category: "PERFORMANCE", metric: "full_investigation_p95_seconds", operator: "LTE", threshold: 45, unit: "SECONDS", blocking: true}
+  - {gate_id: "PERF-003", category: "PERFORMANCE", metric: "expected_load_api_error_rate", operator: "LTE", threshold: 0.01, unit: "RATIO", blocking: true}
+
+  # Reliability
+  - {gate_id: "REL-001", category: "RELIABILITY", metric: "workflow_resume_success_rate", operator: "GTE", threshold: 0.99, unit: "RATIO", blocking: true}
+  - {gate_id: "REL-002", category: "RELIABILITY", metric: "duplicate_material_action_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+
+  # Audit and observability
+  - {gate_id: "AUDIT-001", category: "AUDIT", metric: "gold_case_audit_reconstruction_rate", operator: "GTE", threshold: 1.0, unit: "RATIO", blocking: true}
+  - {gate_id: "OBS-001", category: "OBSERVABILITY", metric: "completed_case_trace_coverage", operator: "GTE", threshold: 1.0, unit: "RATIO", blocking: true}
+
+  # Engineering quality
+  - {gate_id: "ENG-001", category: "ENGINEERING", metric: "overall_python_test_coverage", operator: "GTE", threshold: 0.80, unit: "RATIO", blocking: true}
+  - {gate_id: "ENG-002", category: "ENGINEERING", metric: "critical_module_test_coverage", operator: "GTE", threshold: 0.90, unit: "RATIO", blocking: true}
+  - {gate_id: "ENG-003", category: "ENGINEERING", metric: "type_check_error_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+  - {gate_id: "ENG-004", category: "ENGINEERING", metric: "lint_error_count", operator: "EQ", threshold: 0, unit: "COUNT", blocking: true}
+
+  # Cost is initially monitored but does not block deployment.
+  - {gate_id: "COST-001", category: "COST", metric: "standard_case_llm_cost_usd_p95", operator: "LTE", threshold: 0.15, unit: "USD", blocking: false}

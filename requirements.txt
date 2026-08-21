@@ -1,0 +1,17 @@
+# Core data generation
+numpy
+pandas
+scipy
+faker
+
+# Configuration and validation
+pydantic
+pydantic-settings
+PyYAML
+
+# Parquet support
+pyarrow
+
+# Development / quality
+pytest
+ruff

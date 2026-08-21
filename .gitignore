@@ -1,0 +1,64 @@
+# Python virtual environments.
+.venv/
+venv/
+env/
+
+# Python bytecode and cache files.
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python packaging and build output.
+build/
+dist/
+*.egg-info/
+
+# Local environment configuration and secrets.
+.env
+.env.*
+!.env.example
+
+# Testing and coverage output.
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Static analysis caches.
+.mypy_cache/
+.ruff_cache/
+
+# Local notebook checkpoints.
+.ipynb_checkpoints/
+
+# Generated datasets.
+data/generated/
+data/processed/
+
+# Model artifacts and experiment tracking output.
+artifacts/
+models/artifacts/
+mlruns/
+mlartifacts/
+
+# Application logs.
+logs/
+*.log
+
+# Local database files.
+*.db
+*.sqlite3
+
+# Frontend dependencies and build output.
+node_modules/
+.next/
+out/
+
+# IDE settings that should remain local.
+.vscode/
+.idea/
+
+# Operating system files.
+.DS_Store
+Thumbs.db
