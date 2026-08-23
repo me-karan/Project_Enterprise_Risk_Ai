@@ -6,13 +6,106 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "faker>=40.36.0",
+    "fastapi>=0.141.1",
+    "httpx>=0.28.1",
     "numpy>=2.5.2",
     "pandas>=3.0.5",
     "pyarrow>=25.0.1",
     "pydantic>=2.13.4",
     "pydantic-settings>=2.15.0",
     "pytest>=9.1.1",
+    "python-dotenv>=1.2.3",
     "pyyaml>=6.0.3",
     "ruff>=0.16.4",
     "scipy>=1.18.0",
+    "structlog>=26.1.0",
+    "uvicorn[standard]>=0.52.4",
 ]
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aurarisk"]
+
+
+[project.scripts]
+aurarisk = "aurarisk.__main__:main"
+
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+
+[tool.ruff.lint]
+select = [
+    "E",    # Basic Python style errors.
+    "F",    # Undefined names and unused imports.
+    "I",    # Import ordering.
+    "B",    # Common correctness problems.
+    "UP",   # Modern Python syntax improvements.
+    "SIM",  # Simplification opportunities.
+]
+
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--import-mode=importlib",
+]
+
+testpaths = [
+    "tests",
+]
+
+markers = [
+    "unit: Fast isolated unit tests.",
+    "integration: Tests involving multiple components.",
+    "security: Authentication, authorization, and approval tests.",
+    "slow: Tests that take longer than normal unit tests.",
+]
+
+
+[tool.coverage.run]
+source = ["aurarisk"]
+branch = true
+
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 80
+
+
+[tool.mypy]
+python_version = "3.11"
+files = ["src/aurarisk"]
+strict = true
+warn_unused_configs = true
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "mypy>=2.3.1",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.4",
+    "types-pyyaml>=6.0.12.20260815",
+]
+
+[tool.uv]
+package = true
